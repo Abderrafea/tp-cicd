@@ -1,0 +1,15 @@
+stages:
+  - build
+  - test
+
+image: gradle:8.10-jdk21
+
+build-job:
+  stage: build
+  script:
+    - gradle build -x test
+
+test-job:
+  stage: test
+  script:
+    - gradle test
