@@ -3,15 +3,17 @@
  */
 package simple.gradle.java.app;
 
-@author
+/**
+ * @author Abderrafea
+ */
 public class App {
+
     public static int getSum(int num1, int num2) {
         int somme = num1 + num2;
         return somme;
-
     }
 
     public static void main(String[] args) {
-            System.out.println("Sum is " + getSum(4,5));
+        System.out.println("Sum is " + getSum(4, 5));
     }
 }
