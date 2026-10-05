@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - docker
 
 image: gradle:8.10-jdk21
 
@@ -13,3 +14,12 @@ test-job:
   stage: test
   script:
     - gradle test
+
+docker-build-push:
+  stage: docker
+  image: docker:latest
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
