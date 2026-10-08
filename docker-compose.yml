@@ -1,0 +1,51 @@
+services:
+
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    hostname: gitlab.local
+
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.local:8929'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2424
+        registry_external_url 'http://gitlab.local:5050'
+
+    ports:
+      - "8929:8929"
+      - "2424:22"
+      - "5050:5050"
+
+    volumes:
+      - "/srv/gitlab/config:/etc/gitlab:Z"
+      - "/srv/gitlab/logs:/var/log/gitlab:Z"
+      - "/srv/gitlab/data:/var/opt/gitlab:Z"
+
+    shm_size: "256m"
+
+    networks:
+      cicd:
+        aliases:
+          - gitlab.local
+
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+
+    depends_on:
+      - gitlab
+
+    volumes:
+      - "./runner/config:/etc/gitlab-runner:Z"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+    networks:
+      - cicd
+
+
+networks:
+  cicd:
+    external: true

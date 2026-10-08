@@ -1,0 +1,46 @@
+stages:
+  - build
+  - test
+  - docker
+
+image: gradle:8.10-jdk21
+
+build-job:
+  stage: build
+  script:
+    - gradle build -x test
+
+test-job:
+  stage: test
+  script:
+    - gradle test
+
+docker-build-push:
+  stage: docker
+  image: docker:latest
+
+  variables:
+    BUILDX_NO_DEFAULT_ATTESTATIONS: "1"
+
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+
+release-image:
+  stage: docker
+  image: docker:latest
+
+  variables:
+    BUILDX_NO_DEFAULT_ATTESTATIONS: "1"
+
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build --no-cache -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
