@@ -74,9 +74,9 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            -t ghcr.io/${{ github.repository_owner }}/tp-cicd:latest \
+            -t ghcr.io/abderrafea/tp-cicd:latest \
             .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository_owner }}/tp-cicd:latest
+          docker push ghcr.io/abderrafea/tp-cicd:latest
